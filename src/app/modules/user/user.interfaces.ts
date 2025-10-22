@@ -1,42 +1,43 @@
+/* eslint-disable no-unused-vars */
 import { Types } from "mongoose";
 
 export enum Role {
-  SUPER_ADMIN = "SUPER_ADMIN",
-  ADMIN = "ADMIN",
-  USER = "USER",
-  GUIDE = "GUIDE",
+    SUPER_ADMIN="SUPER_ADMIN",
+    ADMIN = "ADMIN",
+    USER="USER",
+    GUIDE="GUIDE"
 }
 
-// auth providers
-
+// auth provicers
 /**
- * email, password
- * google
- * */
+ * email password
+ * google authentication
+*/
 
 export interface IAuthProvider {
-  provider: string; //google, credentials
-  providerId: string;
+    provider: string; //e.g., Google, Provider
+    providerId: string;
 }
 
-// isActive
-export enum isActive {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  BLOCK = "BLOCKED",
+// active enum
+export enum IsActive {
+    ACTIVE="ACTIVE",
+    INACTIVE="INACTIVE",
+    BLOCKED="BLOCKED"
 }
+
 export interface IUser {
   name: string;
   email: string;
-  phone?: string;
   password?: string;
-  profilePicture?: string;
+  phone?: string;
+  avatar?: string;
   address?: string;
   isDeleted?: boolean;
-  isActive?: isActive;
+  isActive?: IsActive;
   isVerified?: boolean;
-  role: Role;
-  auths: IAuthProvider[];
+  role:Role;
+  auth: IAuthProvider[];
   bookings?: Types.ObjectId[];
   guides?: Types.ObjectId[];
 }

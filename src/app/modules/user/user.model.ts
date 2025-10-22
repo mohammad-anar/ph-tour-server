@@ -1,21 +1,18 @@
 import { model, Schema } from "mongoose";
-import { IAuthProvider, isActive, IUser, Role } from "./user.interfaces";
+import { IAuthProvider, IsActive, IUser, Role } from "./user.interfaces";
 
 const authProviderSchema = new Schema<IAuthProvider>(
   {
     provider: { type: String, required: true },
     providerId: { type: String, required: true },
   },
-  {
-    versionKey: false,
-    _id: false,
-  }
+  { versionKey: false, _id: false }
 );
 
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
     password: { type: String },
     role: {
       type: String,
@@ -23,24 +20,18 @@ const userSchema = new Schema<IUser>(
       default: Role.USER,
     },
     phone: { type: String },
-    profilePicture: { type: String },
+    avatar: { type: String },
     address: { type: String },
     isDeleted: { type: Boolean, default: false },
     isActive: {
       type: String,
-      enum: Object.values(isActive),
-      default: isActive.ACTIVE,
+      enum: Object.values(IsActive),
+      default: IsActive.ACTIVE,
     },
     isVerified: { type: Boolean, default: false },
-    auths: [authProviderSchema],
+    auth: [authProviderSchema],
   },
-  //   bookings referance,
-  // guide referance
-  {
-    timestamps: true,
-    versionKey: false,
-  }
+  { timestamps: true, versionKey: false }
 );
 
-// model for user
 export const User = model<IUser>("User", userSchema);
