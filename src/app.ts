@@ -1,6 +1,7 @@
-import express, { Request, Response } from "express";
-import { UserRoutes } from "./app/modules/user/user.routes";
 import cors from "cors";
+import express, { Request, Response } from "express";
+import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
+import { UserRoutes } from "./app/modules/user/user.routes";
 
 export const app = express();
 
@@ -11,3 +12,7 @@ app.use("/api/v1/user", UserRoutes);
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Welcome to Tour mamangement server!!" });
 });
+
+// global error handler
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(globalErrorHandler);
