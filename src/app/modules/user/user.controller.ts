@@ -4,6 +4,8 @@ import { UserServices } from "./user.service";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // throw new AppError(httpstatus.BAD_REQUEST, "Something went wrong!!!");
+
     const user = await UserServices.createUser(req.body);
 
     res.status(httpstatus.CREATED).json({
