@@ -2,6 +2,7 @@ import cors from "cors";
 import express, { Request, Response } from "express";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
 import { UserRoutes } from "./app/modules/user/user.routes";
+import { notFoundRoute } from "./app/middlewares/notFoundRoute";
 
 export const app = express();
 
@@ -16,3 +17,6 @@ app.get("/", (req: Request, res: Response) => {
 // global error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(globalErrorHandler);
+
+// not found route handler
+app.use(notFoundRoute);
