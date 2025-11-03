@@ -2,9 +2,10 @@ import AppError from "../../errorHelpers/AppError";
 import { IAuthProvider, IUser } from "./user.interfaces";
 import { User } from "./user.model";
 import httpStatus from "http-status-codes";
+import bcrypt from "bcryptjs";
 
 const createUser = async (payload: Partial<IUser>) => {
-  const { email, ...rest } = payload;
+  const { email, password, ...rest } = payload;
   const isUserExist = await User.findOne({ email });
 
   // check this user before create
@@ -15,13 +16,21 @@ const createUser = async (payload: Partial<IUser>) => {
     );
   }
 
+  // hash password
+  const hashedPassword = await bcrypt.hash(password as string, 10);
+
   // make auth provider
   const authProvider: IAuthProvider = {
     provider: "Credentials",
     providerId: email as string,
   };
 
-  const user = await User.create({ email, auth: [authProvider], ...rest });
+  const user = await User.create({
+    email,
+    password: hashedPassword,
+    auth: [authProvider],
+    ...rest,
+  });
 
   return user;
 };
