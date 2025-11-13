@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import httpstatus from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
-import { UserServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
+import { UserServices } from "./user.service";
 
 // create users
 // const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -34,6 +34,33 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
     data: user,
   });
 });
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const payload = req.body;
+
+  // const token = req.headers.authorization;
+
+  // // verify token assert form checkAuth
+  const verifiedToken = req.user;
+
+  // update user
+  const user = await UserServices.updateUser(
+    userId as string,
+    payload,
+    verifiedToken
+  );
+  // res.status(httpstatus.CREATED).json({
+  //   success: true,
+  //   message: "User created successfully",
+  //   data: user,
+  // });
+  sendResponse(res, {
+    success: true,
+    statusCode: httpstatus.CREATED,
+    message: "User updated successfully!!",
+    data: user,
+  });
+});
 
 // get all users
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
@@ -55,6 +82,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 export const UserControllers = {
   createUser,
   getAllUsers,
+  updateUser,
 };
 
 // app - route middleware match
