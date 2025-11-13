@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
+import httpstatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
+import { envVars } from "../../config/env";
+import AppError from "../../errorHelpers/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import httpstatus from "http-status-codes";
-import { AuthServices } from "./auth.service";
-import AppError from "../../errorHelpers/AppError";
 import { setAuthCookies } from "../../utils/setCookie";
+import { createUserTokens } from "../../utils/userToken";
+import { AuthServices } from "./auth.service";
 
 // credentials login
 const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
@@ -79,7 +82,11 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const newPassword = req.body.newPassword;
   const decodedToken = req.user;
 
-  await AuthServices.resetPassword(oldPassword, newPassword, decodedToken);
+  await AuthServices.resetPassword(
+    oldPassword,
+    newPassword,
+    decodedToken as JwtPayload
+  );
 
   //   send response
   sendResponse(res, {
@@ -89,10 +96,40 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
     data: null,
   });
 });
+// google callback controller
+const googleCallbackController = catchAsync(
+  async (req: Request, res: Response) => {
+    let redirectTo = req.query.state ? req.query.state : ("/" as string);
+
+    if ((redirectTo as string).startsWith("/")) {
+      redirectTo = (redirectTo as string)?.slice(1);
+    }
+    // passport js sent this req.user from passport config file which we pass in done function.
+    const user = req.user;
+
+    if (!user) {
+      throw new AppError(httpstatus.NOT_FOUND, "User not found!");
+    }
+
+    const tokenInfo = createUserTokens(user);
+    setAuthCookies(res, tokenInfo);
+    //   send response
+    // sendResponse(res, {
+    //   success: true,
+    //   statusCode: httpstatus.OK,
+    //   message: "Password changed successfully.",
+    //   data: null,
+    // });
+
+    // dont need to send response. just redirect to frontend url
+    res.redirect(`${envVars.FRONT_END_URL}/${redirectTo}`);
+  }
+);
 
 export const AuthControllers = {
   credentialsLogin,
   getNewAccessToken,
   logout,
   resetPassword,
+  googleCallbackController,
 };
