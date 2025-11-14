@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import httpstatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
@@ -8,22 +8,49 @@ import sendResponse from "../../utils/sendResponse";
 import { setAuthCookies } from "../../utils/setCookie";
 import { createUserTokens } from "../../utils/userToken";
 import { AuthServices } from "./auth.service";
+import passport from "passport";
 
 // credentials login
-const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
-  const loginInfo = await AuthServices.credentialsLogin(req.body);
-  // set refresh token and accesstoken to browser cookies
-  // setAuthCookies(res,{accessToken: loginInfo.accessToken});
-  // setAuthCookies(res,{refreshToken: loginInfo.refreshToken});
-  setAuthCookies(res, loginInfo);
-  //   send response
-  sendResponse(res, {
-    success: true,
-    statusCode: httpstatus.OK,
-    message: "User loggedin successfully",
-    data: loginInfo,
-  });
-});
+const credentialsLogin = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // const loginInfo = await AuthServices.credentialsLogin(req.body);
+    passport.authenticate("local", async (error: any, user: any, info: any) => {
+      // console.log(error, "see where login error");
+
+      if (error) {
+        // throw new AppError(401, error);
+        return next(new AppError(401, info?.message || error));
+      }
+
+      if (!user) {
+        return next(
+          new AppError(401, info?.message || "Password doesn't match!")
+        );
+      }
+
+      const userTokens = createUserTokens(user);
+
+      // delete user.toObject().password;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...rest } = user.toObject();
+
+      setAuthCookies(res, userTokens);
+      //   send response
+      sendResponse(res, {
+        success: true,
+        statusCode: httpstatus.OK,
+        message: "User loggedin successfully",
+        data: {
+          ...userTokens,
+          user: rest,
+        },
+      });
+    })(req, res, next);
+    // set refresh token and accesstoken to browser cookies
+    // setAuthCookies(res,{accessToken: loginInfo.accessToken});
+    // setAuthCookies(res,{refreshToken: loginInfo.refreshToken});
+  }
+);
 
 // access token with refresh token
 const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {

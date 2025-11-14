@@ -7,7 +7,51 @@ import {
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
 import { Role } from "../modules/user/user.interfaces";
+import { Strategy as LocalStrategy } from "passport-local";
+import bcrypt from "bcryptjs";
 
+// for credential login
+passport.use(
+  new LocalStrategy(
+    { usernameField: "email", passwordField: "password" },
+    async (email: string, password: string, done: any) => {
+      try {
+        // Get user
+        const user = await User.findOne({ email });
+
+        // MUST return here
+        if (!user) {
+          return done(null, false, { message: "User does not exist." });
+        }
+
+        if (!user.password) {
+          return done(null, false, {
+            message:
+              "This account uses Google login. Please set a password first.",
+          });
+        }
+
+        // bcrypt.compare ONLY after user check
+        const isPasswordMatch = await bcrypt.compare(
+          password,
+          user.password as string
+        );
+
+        // MUST return here
+        if (!isPasswordMatch) {
+          return done(null, false, { message: "Password does not match." });
+        }
+
+        // Success login
+        return done(null, user);
+      } catch (error) {
+        return done(error);
+      }
+    }
+  )
+);
+
+// for google login
 passport.use(
   new GoogleStretegy(
     {
