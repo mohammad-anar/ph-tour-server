@@ -12,12 +12,12 @@ const createUser = async (payload: Partial<IUser>) => {
   const isUserExist = await User.findOne({ email });
 
   // check this user before create
-  if (isUserExist) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "User with this email already exist!!"
-    );
-  }
+  // if (isUserExist) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "User with this email already exist!!"
+  //   );
+  // }
 
   // hash password
   const hashedPassword = await bcrypt.hash(
@@ -48,6 +48,7 @@ const updateUser = async (
   decodedToken: JwtPayload
 ) => {
   const isUserExist = await User.findById(userId);
+
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -55,7 +56,7 @@ const updateUser = async (
   // if (ifUserExist.isDeleted || ifUserExist.isActive === IsActive.BLOCKED) {
   //   throw new AppError(httpStatus.BAD_REQUEST, "Can't update this user!!");
   // }
-  
+
   /**
    * email - can not update
    * name, phone, password, address
@@ -95,7 +96,6 @@ const updateUser = async (
       envVars.BCRYPT_SALT_ROUND
     );
   }
-
 
   // then update the user
   const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {
