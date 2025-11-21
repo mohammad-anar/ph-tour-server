@@ -3,6 +3,7 @@ import httpstatus from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
+import { IUser } from "./user.interfaces";
 
 // create users
 // const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -47,7 +48,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   const user = await UserServices.updateUser(
     userId as string,
     payload,
-    verifiedToken
+    verifiedToken as IUser
   );
   // res.status(httpstatus.CREATED).json({
   //   success: true,
