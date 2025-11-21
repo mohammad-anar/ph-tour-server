@@ -5,13 +5,13 @@ import httpStatus from "http-status-codes";
 
 const createDivision = async (payload: IDivision) => {
   // create slug
-  const baseSlug = payload.name?.toLocaleLowerCase().split(" ").join("-");
-  let slug = `${baseSlug}-division`;
-  let counter = 0;
-  while (await Division.exists({ slug })) {
-    slug = `${slug}-${counter++}`;
-  }
-  payload.slug = slug;
+  // const baseSlug = payload.name?.toLocaleLowerCase().split(" ").join("-");
+  // let slug = `${baseSlug}-division`;
+  // let counter = 0;
+  // while (await Division.exists({ slug })) {
+  //   slug = `${slug}-${counter++}`;
+  // }
+  // payload.slug = slug;
 
   // check duplicate
   const isExistDivision = await Division.findOne({ name: payload.name });
@@ -28,6 +28,7 @@ const createDivision = async (payload: IDivision) => {
   return division;
 };
 
+// get divisions
 const getAllDivisions = async () => {
   const divisions = await Division.find({});
   const totalDivision = await Division.countDocuments();
@@ -40,6 +41,14 @@ const getAllDivisions = async () => {
   };
 };
 
+const getSingleDivision = async (slug:string) => {
+  const division = await Division.findOne({slug});
+  return {
+    data: division
+  }
+}
+
+// update divisions
 const updateDivision = async (id: string, payload: Partial<IDivision>) => {
   // check duplicate
   const isExistDivision = await Division.findById(id);
@@ -89,5 +98,6 @@ export const DivisionService = {
   createDivision,
   updateDivision,
   getAllDivisions,
+  getSingleDivision,
   deleteDivision,
 };
