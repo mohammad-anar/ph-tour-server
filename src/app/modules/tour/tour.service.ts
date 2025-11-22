@@ -33,21 +33,24 @@ const updateTour = async (id: string, payload: ITour) => {
   return tour;
 };
 const getAllTours = async (query: Record<string, string>) => {
-  const queryBuilder = new QueryBuilder(Tour.find(), query);
+  //   const queryBuilder = new QueryBuilder(Tour.find(), query);
 
-  const tours = await queryBuilder
-    .search(tourSearchableFields)
-    .filter()
-    .sort()
-    .paginate();
+  //   const tours = await queryBuilder
+  //     .search(tourSearchableFields)
+  //     .filter()
+  //     .sort()
+  //     .paginate();
 
-  // const meta = await queryBuilder.getMeta();
-  const [data, meta] = await Promise.all([
-    tours.build(),
-    queryBuilder.getMeta(),
-  ]);
+  //   // const meta = await queryBuilder.getMeta();
+  //   const [data, meta] = await Promise.all([
+  //     tours.build(),
+  //     queryBuilder.getMeta(),
+  //   ]);
 
-  return { data, meta };
+  const tours = await Tour.find(query);
+  const total = await Tour.countDocuments();
+
+  return { data: tours, meta: { total } };
 };
 
 const createTourType = async (payload: ITourType) => {

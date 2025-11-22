@@ -5,6 +5,7 @@ import { tourService } from "./tour.service";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
 
+// create tour
 const createTour = catchAsync(async (req: Request, res: Response) => {
   const result = await tourService.createTour(req.body);
 
@@ -15,6 +16,7 @@ const createTour = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+// update tour
 const updateTour = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   if (!id) {
@@ -30,10 +32,13 @@ const updateTour = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get all tours
 const getAllTours = catchAsync(async (req: Request, res: Response) => {
-  const result = await tourService.getAllTours(
-    req.query as Record<string, string>
-  );
+  const query = req.query || {};
+
+  console.log({ query });
+
+  const result = await tourService.getAllTours(query as Record<string, string>);
 
   sendResponse(res, {
     statusCode: 201,
