@@ -69,15 +69,15 @@ const updateDivision = async (id: string, payload: Partial<IDivision>) => {
     );
   }
 
-  if (payload.name) {
-    const baseSlug = payload.name?.toLocaleLowerCase().split(" ").join("-");
-    let slug = `${baseSlug}-division`;
-    let counter = 0;
-    while (await Division.exists({ slug })) {
-      slug = `${slug}-${counter++}`;
-    }
-    payload.slug = slug;
-  }
+  // if (payload.name) {
+  //   const baseSlug = payload.name?.toLocaleLowerCase().split(" ").join("-");
+  //   let slug = `${baseSlug}-division`;
+  //   let counter = 0;
+  //   while (await Division.exists({ slug })) {
+  //     slug = `${slug}-${counter++}`;
+  //   }
+  //   payload.slug = slug;
+  // }
 
   const updatedDivision = await Division.findByIdAndUpdate(id, payload, {
     new: true,
