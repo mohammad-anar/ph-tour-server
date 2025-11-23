@@ -34,16 +34,16 @@ const updateTour = catchAsync(async (req: Request, res: Response) => {
 
 // get all tours
 const getAllTours = catchAsync(async (req: Request, res: Response) => {
-  const query = req.query || {};
-
-  console.log({ query });
+  const query = req.query;
 
   const result = await tourService.getAllTours(query as Record<string, string>);
+
+  console.log(result, "see where result in tour get contorller");
 
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: "Tour created successfully",
+    message: "Tour retrieve successfully",
     data: result.data,
     meta: result.meta,
   });
