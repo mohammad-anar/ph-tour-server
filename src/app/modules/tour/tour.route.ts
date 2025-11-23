@@ -19,17 +19,19 @@ router.post(
   validateRequest(createTourTypeZodSchema),
   tourController.createTourType
 );
-// router.patch(
-//   "/tour-types/:id",
-//   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-//   validateRequest(createTourTypeZodSchema),
-//   tourController.updateTourType
-// );
-// router.patch(
-//   "/tour-types/:id",
-//   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-//   tourController.deleteTourType
-// );
+
+router.get("/tour-types", tourController.getAllTourTypes);
+router.patch(
+  "/tour-types/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  validateRequest(createTourTypeZodSchema),
+  tourController.updateTourType
+);
+router.delete(
+  "/tour-types/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  tourController.deleteTourType
+);
 /* -------------tour routes-------------------*/
 router.get("/", tourController.getAllTours);
 router.post(

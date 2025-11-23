@@ -130,10 +130,59 @@ const createTourType = async (payload: ITourType) => {
 
   return await TourType.create(payload);
 };
+const getAllTourTypes = async (query: Record<string, string>) => {
+  // const tourTypes = await TourType.find({});
+
+  const queryBuilder = new QueryBuilder<ITourType>(TourType.find(), query);
+
+  const tourTypes = queryBuilder
+    .filter()
+    .fields()
+    .sort()
+    .paginate()
+    .search(["name"]);
+
+  const [data, meta] = await Promise.all([
+    tourTypes.build(),
+    queryBuilder.getMeta(),
+  ]);
+
+  return { data, meta };
+};
+
+const updateTourType = async (id: string, payload: ITourType) => {
+  const existingTourType = await TourType.findById(id);
+  if (!existingTourType) {
+    throw new AppError(
+      httpstatus.BAD_REQUEST,
+      "Tour with this id does not exist!"
+    );
+  }
+
+  const updatedTourType = await TourType.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+
+  return updatedTourType;
+};
+const deleteTourType = async (id: string) => {
+  const existingTourType = await TourType.findById(id);
+  if (!existingTourType) {
+    throw new AppError(
+      httpstatus.BAD_REQUEST,
+      "Tour with this id does not exist!"
+    );
+  }
+
+  return await TourType.findByIdAndDelete(id);
+};
 
 export const tourService = {
   createTour,
   getAllTours,
   createTourType,
   updateTour,
+  getAllTourTypes,
+  updateTourType,
+  deleteTourType,
 };

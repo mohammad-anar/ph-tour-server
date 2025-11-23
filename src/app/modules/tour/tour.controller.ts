@@ -59,10 +59,54 @@ const createTourType = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getAllTourTypes = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const result = await tourService.getAllTourTypes(
+    query as Record<string, string>
+  );
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Tour type retrieve successfully",
+    data: result.data,
+    meta: result.meta,
+  });
+});
+const updateTourType = catchAsync(async (req: Request, res: Response) => {
+  const payload = req.body;
+  const id = req.params.id;
+  if (!id) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Id not provided!");
+  }
+  const result = await tourService.updateTourType(id, payload);
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Tour type updated successfully",
+    data: result,
+  });
+});
+const deleteTourType = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  if (!id) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Id not provided!");
+  }
+  await tourService.deleteTourType(id);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Tour type deleted successfully",
+    data: null,
+  });
+});
 
 export const tourController = {
   createTour,
   getAllTours,
   createTourType,
   updateTour,
+  getAllTourTypes,
+  updateTourType,
+  deleteTourType
 };
