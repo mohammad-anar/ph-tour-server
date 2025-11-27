@@ -39,7 +39,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${envVars.FRONT_END_URL}/login`,
+    failureRedirect: `${envVars.FRONT_END_URL}/login?error=There is some issue on your account. Please contact with support team.`,
   }),
   AuthControllers.googleCallbackController
 );

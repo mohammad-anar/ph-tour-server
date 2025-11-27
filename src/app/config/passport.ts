@@ -25,21 +25,21 @@ passport.use(
         }
 
         if (!user.isVerified) {
-          done(`User is not verified`);
+          return done(`User is not verified`);
         }
 
         if (
           user.isActive === IsActive.BLOCKED ||
           user.isActive === IsActive.INACTIVE
         ) {
-          done(`User is ${user.isActive}`);
+          return done(`User is ${user.isActive}`);
         }
         if (user.isDeleted) {
           // throw new AppError(
           //   httpStatus.BAD_REQUEST,
           //   `User is ${user.isDeleted}`
           // );
-          done(`User is deleted`);
+          return done(`User is deleted`);
         }
 
         if (!user.password) {
@@ -87,10 +87,28 @@ passport.use(
         const email = profile.emails?.[0]?.value;
 
         if (!email) {
-          done(null, false, { message: "No email found!" });
+          return done(null, false, { message: "No email found!" });
         }
 
         let user = await User.findOne({ email: email });
+
+        if (user && !user.isVerified) {
+          return done(null, false, { message: `User is not verified` });
+        }
+
+        if (
+          (user && user.isActive === IsActive.BLOCKED) ||
+          (user && user.isActive === IsActive.INACTIVE)
+        ) {
+          return done(`User is ${user.isActive}`);
+        }
+        if (user && user.isDeleted) {
+          // throw new AppError(
+          //   httpStatus.BAD_REQUEST,
+          //   `User is ${user.isDeleted}`
+          // );
+          return done(null, false, { message: `User is deleted` });
+        }
 
         if (!user) {
           const newUser = {
@@ -106,10 +124,10 @@ passport.use(
           user.save();
         }
 
-        done(null, user);
+        return done(null, user);
       } catch (error) {
         console.log(error);
-        done(error, false);
+        return done(error, false);
       }
     }
   )
@@ -118,15 +136,15 @@ passport.use(
 // serializer and deserialize user
 
 passport.serializeUser((user: any, done: (err: any, id?: unknown) => void) => {
-  done(null, user._id);
+  return done(null, user._id);
 });
 
 passport.deserializeUser(async (id: string, done: any) => {
   try {
     const user = User.findById(id);
-    done(null, user);
+    return done(null, user);
   } catch (error) {
-    done(error);
+    return done(error);
     console.log(error);
   }
 });
