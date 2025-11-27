@@ -6,7 +6,7 @@ import {
 } from "passport-google-oauth20";
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
-import { Role } from "../modules/user/user.interfaces";
+import { IsActive, Role } from "../modules/user/user.interfaces";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
 
@@ -22,6 +22,24 @@ passport.use(
         // MUST return here
         if (!user) {
           return done(null, false, { message: "User does not exist." });
+        }
+
+        if (!user.isVerified) {
+          done(`User is not verified`);
+        }
+
+        if (
+          user.isActive === IsActive.BLOCKED ||
+          user.isActive === IsActive.INACTIVE
+        ) {
+          done(`User is ${user.isActive}`);
+        }
+        if (user.isDeleted) {
+          // throw new AppError(
+          //   httpStatus.BAD_REQUEST,
+          //   `User is ${user.isDeleted}`
+          // );
+          done(`User is deleted`);
         }
 
         if (!user.password) {
