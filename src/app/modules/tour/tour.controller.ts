@@ -4,10 +4,16 @@ import sendResponse from "../../utils/sendResponse";
 import { tourService } from "./tour.service";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
+import { ITour } from "./tour.interfaces";
 
 // create tour
 const createTour = catchAsync(async (req: Request, res: Response) => {
-  const result = await tourService.createTour(req.body);
+  const payload: ITour = {
+    ...req.body,
+    images: (req.files as Express.Multer.File[])?.map((file) => file?.path),
+  };
+
+  const result = await tourService.createTour(payload);
 
   sendResponse(res, {
     statusCode: 201,
@@ -19,10 +25,15 @@ const createTour = catchAsync(async (req: Request, res: Response) => {
 // update tour
 const updateTour = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
+
+  const payload: ITour = {
+    ...req.body,
+    images: (req.files as Express.Multer.File[])?.map((file) => file?.path),
+  };
   if (!id) {
     throw new AppError(httpStatus.BAD_REQUEST, "Id does not provided.");
   }
-  const result = await tourService.updateTour(id, req.body);
+  const result = await tourService.updateTour(id, payload);
 
   sendResponse(res, {
     statusCode: 201,

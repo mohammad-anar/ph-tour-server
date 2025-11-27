@@ -12,12 +12,12 @@ const createUser = async (payload: Partial<IUser>) => {
   const isUserExist = await User.findOne({ email });
 
   // check this user before create
-  // if (isUserExist) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     "User with this email already exist!!"
-  //   );
-  // }
+  if (isUserExist) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User with this email already exist!!"
+    );
+  }
 
   // hash password
   const hashedPassword = await bcrypt.hash(
@@ -117,5 +117,12 @@ const getAllUsers = async () => {
     },
   };
 };
+const getMe = async (userId: string) => {
+  const users = await User.findById(userId).select("-password");
 
-export const UserServices = { createUser, getAllUsers, updateUser };
+  return {
+    data: users,
+  };
+};
+
+export const UserServices = { createUser, getAllUsers, updateUser, getMe };

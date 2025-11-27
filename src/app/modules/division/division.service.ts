@@ -1,3 +1,4 @@
+import { deleteImageFromCloudinary } from "../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
 import { IDivision } from "./division.interface";
 import { Division } from "./division.model";
@@ -41,12 +42,12 @@ const getAllDivisions = async () => {
   };
 };
 
-const getSingleDivision = async (slug:string) => {
-  const division = await Division.findOne({slug});
+const getSingleDivision = async (slug: string) => {
+  const division = await Division.findOne({ slug });
   return {
-    data: division
-  }
-}
+    data: division,
+  };
+};
 
 // update divisions
 const updateDivision = async (id: string, payload: Partial<IDivision>) => {
@@ -83,6 +84,10 @@ const updateDivision = async (id: string, payload: Partial<IDivision>) => {
     new: true,
     reValidators: true,
   });
+
+  if (payload.thumbnail && isExistDivision.thumbnail) {
+    await deleteImageFromCloudinary(isExistDivision.thumbnail);
+  }
 
   return updatedDivision;
 };

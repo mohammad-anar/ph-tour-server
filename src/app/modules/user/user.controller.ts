@@ -4,6 +4,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
 import { IUser } from "./user.interfaces";
+import { JwtPayload } from "jsonwebtoken";
 
 // create users
 // const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -74,9 +75,24 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: httpstatus.OK,
-    message: "User retrive successfully!!",
+    message: "All users retrieve successfully!!",
     data: data?.data,
     meta: data?.meta,
+  });
+});
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as JwtPayload;
+  const data = await UserServices.getMe(user?.userId);
+  // res.status(httpstatus.OK).json({
+  //   success: true,
+  //   message: "All user retrive successfully",
+  //   data: users,
+  // });
+  sendResponse(res, {
+    success: true,
+    statusCode: httpstatus.OK,
+    message: "Your profile retrieve successfully!!",
+    data: data?.data,
   });
 });
 
@@ -84,6 +100,7 @@ export const UserControllers = {
   createUser,
   getAllUsers,
   updateUser,
+  getMe,
 };
 
 // app - route middleware match

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
+import { deleteImageFromCloudinary } from "../config/cloudinary.config";
 import { envVars } from "../config/env";
 import AppError from "../errorHelpers/AppError";
-import { error } from "console";
 
-export const globalErrorHandler = (
+export const globalErrorHandler = async (
   err: any,
   req: Request,
   res: Response,
@@ -13,6 +13,21 @@ export const globalErrorHandler = (
   if (envVars.NODE_ENV === "development") {
     console.log(err);
   }
+
+  // cloudinary fle delete
+  if (req.file) {
+    await deleteImageFromCloudinary(req.file.path);
+  }
+
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    const imageUrls = (req.files as Express.Multer.File[]).map(
+      (file) => file.path
+    );
+
+    await Promise.all(imageUrls.map((url) => deleteImageFromCloudinary(url)));
+  }
+  // cloudinary file deleted
+
   let statusCode = 500;
   let message = `Something went wrong!!`;
   const errorSources: any = [

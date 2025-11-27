@@ -1,14 +1,14 @@
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
+import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import {
   createUserTokens,
   getNewAccessTokenWithRefreshToken,
 } from "../../utils/userToken";
-import { IUser } from "../user/user.interfaces";
+import { IAuthProvider, IUser } from "../user/user.interfaces";
 import { User } from "../user/user.model";
-import { envVars } from "../../config/env";
 
 const credentialsLogin = async (payload: Partial<IUser>) => {
   const { email, password } = payload;
@@ -69,15 +69,79 @@ const resetPassword = async (
     newPassword,
     Number(envVars.BCRYPT_SALT_ROUND)
   );
-  
+
   // save the user
   user?.save();
 
   return true;
+};
+const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+  decodedToken: JwtPayload
+) => {
+  const user = await User.findById(decodedToken.userId);
+  const isOldPasswordMatch = await bcrypt.compare(
+    oldPassword,
+    user?.password as string
+  );
+
+  if (!isOldPasswordMatch) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Old password does not match.");
+  }
+
+  // hash new password
+  (user as IUser).password = await bcrypt.hash(
+    newPassword,
+    Number(envVars.BCRYPT_SALT_ROUND)
+  );
+
+  // save the user
+  user?.save();
+
+  return true;
+};
+const setPassword = async (userId: string, plainPassword: string) => {
+  const user = (await User.findById(userId)) as JwtPayload;
+
+  console.log({ user });
+  if (!user) {
+    throw new AppError(404, "User not found.");
+  }
+
+  if (
+    user?.password &&
+    user.auth.some(
+      (providerObject: IAuthProvider) => providerObject.provider === "Google"
+    )
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You have already password. Please reset or change your password from your profile"
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    plainPassword,
+    Number(envVars.BCRYPT_SALT_ROUND)
+  );
+
+  const auth: IAuthProvider[] = [
+    ...user.auth,
+    { provider: "Credentials", providerId: user.email },
+  ];
+
+  user.password = hashedPassword;
+  user.auth = auth;
+  await user.save();
+
+  return user;
 };
 
 export const AuthServices = {
   credentialsLogin,
   getNewAccessToken,
   resetPassword,
+  changePassword,
+  setPassword,
 };
