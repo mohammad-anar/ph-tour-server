@@ -1,8 +1,12 @@
+import { uploadBufferToCloudinary } from "../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
+import { generatePDF, IInvoiceData } from "../../utils/pdf/payment.invoice";
+import { sendEmail } from "../../utils/sendEmail";
 import { BOOKING_STATUS } from "../booking/booking.interface";
 import { Booking } from "../booking/booking.model";
 import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
 import { SSLService } from "../sslCommerz/sslCommerz.service";
+import { ITour } from "../tour/tour.interfaces";
 import { IUser } from "../user/user.interfaces";
 import { PAYMENT_STATUS } from "./payment.interface";
 import { Payment } from "./payment.model";
@@ -57,13 +61,53 @@ const successPayment = async (query: Record<string, string>) => {
     );
 
     // update booking
-    await Booking.findByIdAndUpdate(
+    const updatedBooking = await Booking.findByIdAndUpdate(
       updatedPayment?.booking,
       {
         status: BOOKING_STATUS.COMPLETED,
       },
+      { new: true, runValidators: true, session }
+    )
+      .populate("tour", "title")
+      .populate("user", "name email");
+
+    const invoiceData: IInvoiceData = {
+      bookingDate: updatedBooking?.createdAt as Date,
+      guestCount: updatedBooking?.guestCount as number,
+      totalAmount: updatedPayment?.amount as number,
+      tourTitle: (updatedBooking?.tour as unknown as ITour).title,
+      transactionId: updatedPayment?.transactionId as string,
+      userName: (updatedBooking?.user as unknown as IUser).name,
+    };
+
+    const pdfBuffer = await generatePDF(invoiceData);
+
+    const cloudinaryResult: any = await uploadBufferToCloudinary(
+      pdfBuffer,
+      "invoice"
+    );
+
+    await Payment.findByIdAndUpdate(
+      updatedPayment?._id,
+      {
+        invoiceUrl: cloudinaryResult?.secure_url,
+      },
       { runValidators: true, session }
     );
+
+    await sendEmail({
+      to: (updatedBooking?.user as unknown as IUser).email,
+      subject: "Your Booking invoice.",
+      templateName: "invoice",
+      templateData: invoiceData,
+      attachments: [
+        {
+          fileName: "invoice.pdf",
+          content: pdfBuffer,
+          contentType: "application/pdf",
+        },
+      ],
+    });
 
     await session.commitTransaction();
     session.endSession();
@@ -131,10 +175,27 @@ const canceledPayment = async (query: Record<string, string>) => {
     console.log(error);
   }
 };
+const getInvoiceUrl = async (paymentId: string) => {
+  try {
+    const payment = await Payment.findById(paymentId).select("invoiceUrl");
+
+    if (!payment) {
+      throw new AppError(401, "Payment not found");
+    }
+    if (!payment.invoiceUrl) {
+      throw new AppError(401, "No invoiceUrl found");
+    }
+
+    return payment.invoiceUrl;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const PaymentService = {
   makePayment,
   successPayment,
   failedPayment,
   canceledPayment,
+  getInvoiceUrl,
 };

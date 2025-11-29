@@ -58,10 +58,23 @@ const canceledPayment = catchAsync(async (req: Request, res: Response) => {
     );
   }
 });
+const getInvoiceUrl = catchAsync(async (req: Request, res: Response) => {
+  //
+  const { paymentId } = req.params;
+  const result = await PaymentService.getInvoiceUrl(paymentId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Invoice download URL retrieve successfully",
+    data: result,
+  });
+});
 
 export const PaymentController = {
   makePayment,
   successPayment,
   failedPayment,
   canceledPayment,
+  getInvoiceUrl,
 };

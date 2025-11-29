@@ -13,15 +13,11 @@ router.post(
   UserControllers.createUser
 );
 
-router.get(
-  "/get-me",
-  checkAuth(...Object.values(Role)),
-  UserControllers.getMe
-);
+router.get("/get-me", checkAuth(...Object.values(Role)), UserControllers.getMe);
 // update user
 router.patch(
   "/:id",
-  checkAuth(...Object.values(Role)),
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   UserControllers.updateUser
 );
 

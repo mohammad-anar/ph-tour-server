@@ -47,11 +47,24 @@ const updateUser = async (
   payload: Partial<IUser>,
   decodedToken: JwtPayload
 ) => {
+  if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
+    if (userId !== decodedToken.userId) {
+      throw new AppError(403, "You are not authorized");
+    }
+  }
+
   const isUserExist = await User.findById(userId);
 
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
+
+  // if (
+  //   decodedToken.role === Role.USER &&
+  //   isUserExist.role === Role.SUPER_ADMIN
+  // ) {
+  //   throw new AppError(403, "You are not authorized");
+  // }
 
   // if (ifUserExist.isDeleted || ifUserExist.isActive === IsActive.BLOCKED) {
   //   throw new AppError(httpStatus.BAD_REQUEST, "Can't update this user!!");
@@ -87,14 +100,6 @@ const updateUser = async (
     if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
     }
-  }
-
-  // if want to update password then hashed it
-  if (payload.password) {
-    payload.password = await bcrypt.hash(
-      payload.password,
-      envVars.BCRYPT_SALT_ROUND
-    );
   }
 
   // then update the user
