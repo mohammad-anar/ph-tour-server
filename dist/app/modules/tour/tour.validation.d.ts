@@ -1,0 +1,116 @@
+import { z } from "zod/v3";
+export declare const createTourZodSchema: z.ZodObject<{
+    title: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    location: z.ZodOptional<z.ZodString>;
+    costFrom: z.ZodOptional<z.ZodNumber>;
+    startDate: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    endDate: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    tourType: z.ZodString;
+    included: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    excluded: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    amenities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    tourPlan: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    maxGuest: z.ZodOptional<z.ZodNumber>;
+    minAge: z.ZodOptional<z.ZodNumber>;
+    division: z.ZodString;
+    departureLocation: z.ZodOptional<z.ZodString>;
+    arrivalLocation: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    title: string;
+    division: string;
+    tourType: string;
+    description?: string | undefined;
+    location?: string | undefined;
+    costFrom?: number | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+    departureLocation?: string | undefined;
+    arrivalLocation?: string | undefined;
+    included?: string[] | undefined;
+    excluded?: string[] | undefined;
+    amenities?: string[] | undefined;
+    tourPlan?: string[] | undefined;
+    maxGuest?: number | undefined;
+    minAge?: number | undefined;
+}, {
+    title: string;
+    division: string;
+    tourType: string;
+    description?: string | undefined;
+    location?: string | undefined;
+    costFrom?: number | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+    departureLocation?: string | undefined;
+    arrivalLocation?: string | undefined;
+    included?: string[] | undefined;
+    excluded?: string[] | undefined;
+    amenities?: string[] | undefined;
+    tourPlan?: string[] | undefined;
+    maxGuest?: number | undefined;
+    minAge?: number | undefined;
+}>;
+export declare const updateTourZodSchema: z.ZodObject<{
+    title: z.ZodOptional<z.ZodString>;
+    description: z.ZodOptional<z.ZodString>;
+    location: z.ZodOptional<z.ZodString>;
+    costFrom: z.ZodOptional<z.ZodNumber>;
+    startDate: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    endDate: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    tourType: z.ZodOptional<z.ZodString>;
+    included: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    excluded: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    amenities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    tourPlan: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    maxGuest: z.ZodOptional<z.ZodNumber>;
+    minAge: z.ZodOptional<z.ZodNumber>;
+    division: z.ZodOptional<z.ZodString>;
+    departureLocation: z.ZodOptional<z.ZodString>;
+    arrivalLocation: z.ZodOptional<z.ZodString>;
+    deleteImages: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+}, "strip", z.ZodTypeAny, {
+    description?: string | undefined;
+    title?: string | undefined;
+    location?: string | undefined;
+    costFrom?: number | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+    departureLocation?: string | undefined;
+    arrivalLocation?: string | undefined;
+    included?: string[] | undefined;
+    excluded?: string[] | undefined;
+    amenities?: string[] | undefined;
+    tourPlan?: string[] | undefined;
+    maxGuest?: number | undefined;
+    minAge?: number | undefined;
+    division?: string | undefined;
+    tourType?: string | undefined;
+    deleteImages?: string[] | undefined;
+}, {
+    description?: string | undefined;
+    title?: string | undefined;
+    location?: string | undefined;
+    costFrom?: number | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+    departureLocation?: string | undefined;
+    arrivalLocation?: string | undefined;
+    included?: string[] | undefined;
+    excluded?: string[] | undefined;
+    amenities?: string[] | undefined;
+    tourPlan?: string[] | undefined;
+    maxGuest?: number | undefined;
+    minAge?: number | undefined;
+    division?: string | undefined;
+    tourType?: string | undefined;
+    deleteImages?: string[] | undefined;
+}>;
+export declare const createTourTypeZodSchema: z.ZodObject<{
+    name: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+}, {
+    name: string;
+}>;
+//# sourceMappingURL=tour.validation.d.ts.map
