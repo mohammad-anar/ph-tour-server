@@ -29,6 +29,7 @@ interface EnvConfig {
     SSL_SUCCESS_FRONTEND_URL: string;
     SSL_FAILED_FRONTEND_URL: string;
     SSL_CANCEL_FRONTEND_URL: string;
+    SSL_IPN_URL: string;
   };
   CLOUDINARY: {
     CLOUDINARY_CLOUD_NAME: string;
@@ -69,6 +70,7 @@ const loadEnvVars = (): EnvConfig => {
     "SSL_STORE_PASS",
     "SSL_PAYMENT_API",
     "SSL_VALIDATION_API",
+    "SSL_IPN_URL",
     "SSL_SUCCESS_BACKEND_URL",
     "SSL_FAILED_BACKEND_URL",
     "SSL_CANCEL_BACKEND_URL",
@@ -122,6 +124,7 @@ const loadEnvVars = (): EnvConfig => {
       SSL_SUCCESS_FRONTEND_URL: process.env.SSL_SUCCESS_FRONTEND_URL as string,
       SSL_FAILED_FRONTEND_URL: process.env.SSL_FAILED_FRONTEND_URL as string,
       SSL_CANCEL_FRONTEND_URL: process.env.SSL_CANCEL_FRONTEND_URL as string,
+      SSL_IPN_URL: process.env.SSL_IPN_URL as string,
     },
     CLOUDINARY: {
       CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,

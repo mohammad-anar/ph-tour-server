@@ -2,7 +2,7 @@ import { Booking } from "../booking/booking.model";
 import { PAYMENT_STATUS } from "../payment/payment.interface";
 import { Payment } from "../payment/payment.model";
 import { Tour } from "../tour/tour.model";
-import { IsActive, IUser } from "../user/user.interfaces";
+import { IsActive } from "../user/user.interfaces";
 import { User } from "../user/user.model";
 
 const now = new Date();
